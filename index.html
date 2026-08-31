@@ -71,7 +71,7 @@ input[type=text]{
 .qr-wrap.show{display:block;animation:pop .5s ease}
 @keyframes pop{from{opacity:0;transform:translateZ(0) rotateX(-14deg)}to{opacity:1;transform:translateZ(20px) rotateX(.6deg)}}
 #qr{display:inline-block;padding:16px;border-radius:18px;background:#fff;box-shadow:8px 8px 20px var(--shadow), -8px -8px 20px var(--light)}
-#qr img,#qr canvas{display:block;width:220px;height:220px;image-rendering:pixelated}
+#qr img,#qr canvas,#qr svg{display:block;width:240px;height:240px}
 .link{word-break:break-all;font-size:12.5px;color:var(--muted);margin:14px 0 0}
 .status{text-align:center;font-size:13px;color:var(--muted);min-height:18px;margin-top:10px}
 .bar{height:6px;border-radius:6px;background:var(--bg);overflow:hidden;margin-top:14px;box-shadow:inset 3px 3px 6px var(--shadow)}
@@ -114,12 +114,6 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:8px}
       <button class="btn" id="share">Kongsi</button>
       <button class="btn" id="dl">Simpan QR</button>
     </div>
-  </section>
-
-  <section class="card">
-    <label class="field" for="endpoint">URL Google Apps Script</label>
-    <input id="endpoint" type="text" placeholder="https://script.google.com/macros/s/.../exec" />
-    <div class="row"><button class="btn" id="saveEp">Simpan tetapan</button></div>
   </section>
 
   <footer>Berfungsi luar talian &bull; Fail disimpan dalam Google Drive anda</footer>
@@ -2428,19 +2422,11 @@ var qrcode = window.qrcode || qrcode;</script>
 //=====================================================================
 // ★★★ TAMPAL URL /exec GOOGLE APPS SCRIPT ANDA DI SINI ★★★
 var APPS_SCRIPT_URL = '';
-// Contoh: var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeCAfrzLQx0NemPPvCUQ8zTrlNSl69s1PX2wnBQIITAUVIXRnnBGGDG4cI3uPNMfZPsQ/exec';
+// Contoh: var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycb.../exec';
 //=====================================================================
 (function(){
   var $ = function(id){return document.getElementById(id)};
-  var EP_KEY = 'qrshare.endpoint';
-  var endpoint = APPS_SCRIPT_URL || localStorage.getItem(EP_KEY) || '';
-  $('endpoint').value = endpoint;
-
-  $('saveEp').onclick = function(){
-    endpoint = $('endpoint').value.trim();
-    localStorage.setItem(EP_KEY, endpoint);
-    say('Tetapan disimpan.');
-  };
+  var endpoint = APPS_SCRIPT_URL;
 
   function say(t){ $('status').textContent = t; }
   function prog(p){ $('bar').style.width = (p*100)+'%'; }
@@ -2449,13 +2435,14 @@ var APPS_SCRIPT_URL = '';
   function renderQR(text){
     current = text;
     var box = $('qr'); box.innerHTML = '';
-    var typeNumber = 0, qr;
-    try{
-      qr = qrcode(typeNumber, 'M'); qr.addData(text); qr.make();
-    }catch(e){
-      qr = qrcode(0, 'L'); qr.addData(text); qr.make();
+    var qr = null, levels = ['H','M','L'];
+    for(var i = 0; i < levels.length; i++){
+      try{
+        qr = qrcode(0, levels[i]); qr.addData(text); qr.make(); break;
+      }catch(e){ qr = null; }
     }
-    box.innerHTML = qr.createImgTag(8, 0);
+    if(!qr){ say('Kandungan terlalu panjang untuk kod QR.'); return; }
+    box.innerHTML = qr.createSvgTag({ cellSize: 12, margin: 2, scalable: true });
     $('outLink').textContent = text;
     $('qrCard').classList.add('show');
     $('qrCard').scrollIntoView({behavior:'smooth', block:'center'});
@@ -2524,10 +2511,26 @@ var APPS_SCRIPT_URL = '';
     else say('Peranti ini tidak menyokong perkongsian asli.');
   };
   $('dl').onclick = function(){
-    var img = document.querySelector('#qr img');
-    if(!img) return;
-    var a = document.createElement('a');
-    a.href = img.src; a.download = 'qr-kongsi.gif'; a.click();
+    var svg = document.querySelector('#qr svg');
+    if(!svg) return;
+    var SIZE = 1024;
+    var data = new XMLSerializer().serializeToString(svg);
+    var url = URL.createObjectURL(new Blob([data], {type:'image/svg+xml'}));
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement('canvas');
+      c.width = c.height = SIZE;
+      var ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, SIZE, SIZE);
+      ctx.drawImage(img, 0, 0, SIZE, SIZE);
+      URL.revokeObjectURL(url);
+      var a = document.createElement('a');
+      a.href = c.toDataURL('image/png');
+      a.download = 'qr-kongsi.png';
+      a.click();
+    };
+    img.src = url;
   };
 
   if('serviceWorker' in navigator){

@@ -1,0 +1,20 @@
+{
+  "name": "QR Kongsi",
+  "short_name": "QR Kongsi",
+  "description": "Tukar apa-apa fail atau pautan kepada kod QR untuk dikongsi.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "ms",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMiIgZmlsbD0iI2ZmZmZmZiIvPjxnIGZpbGw9IiMxZDIzMzAiPjxyZWN0IHg9Ijk2IiB5PSI5NiIgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyMCIvPjxyZWN0IHg9IjI5NiIgeT0iOTYiIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMjAiLz48cmVjdCB4PSI5NiIgeT0iMjk2IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIwIi8+PHJlY3QgeD0iMjk2IiB5PSIyOTYiIHdpZHRoPSI1NiIgaGVpZ2h0PSI1NiIgcng9IjEyIiBmaWxsPSIjMmY2ZGY2Ii8+PHJlY3QgeD0iMzYwIiB5PSIzNjAiIHdpZHRoPSI1NiIgaGVpZ2h0PSI1NiIgcng9IjEyIiBmaWxsPSIjMmY2ZGY2Ii8+PC9nPjwvc3ZnPg==",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
